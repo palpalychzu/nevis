@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Client Fact-Find</title>
+<!-- v2: Figma "Iterations 2" (node 1:652) as tokens → components → screens. -->
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+</head>
+<body data-view="welcome">
+<div class="proto">
+  <span class="proto__badge">Prototype</span>
+  <span>Sample client. Nothing you type leaves this page.</span>
+  <button type="button" data-act="fillAll">Fill with sample data</button>
+  <button type="button" data-act="reset">Start over</button>
+</div>
+<div class="app">
+  <header class="hdr">
+    <button type="button" class="hdr__logo" data-go="welcome" aria-label="Nevis, back to welcome"></button>
+    <div class="hdr__actions">
+      <button type="button" class="btn btn--outline" data-act="questions">Questions?</button>
+      <button type="button" class="btn btn--outline" data-act="save">Save &amp; exit</button>
+    </div>
+  </header>
+  <div class="shell">
+    <nav class="rail" id="rail" aria-label="Steps"></nav>
+    <main id="main"></main>
+    <aside class="sum" id="sum" aria-label="Your net worth"></aside>
+  </div>
+</div>
+<div id="layer"></div>
+<script src="data.js"></script>
+<script src="icons.js"></script>
+<script>document.querySelector('.hdr__logo').innerHTML = ICON.logo;</script>
+<script src="app.js"></script>
+<script src="components.js"></script>
+<script src="steps.js"></script>
+</body>
+</html>
