@@ -162,9 +162,17 @@ function enter(back, chrome) { // a new page: its blocks rise in, 50ms apart
   els.forEach((el, i) => el.animate([{ opacity: 0, transform: `translateY(${back ? -12 : 12}px)` }, { opacity: 1, transform: 'none' }], { duration: 400, delay: Math.min(i, 6) * 50, easing: EASE_OUT, fill: 'backwards' }));
 }
 let SWAP = 0;
-function swap(back) { // page transition: the old page fades out, then the new one comes in
+function reveal(to) { // Review's per-row Edit: the new page opens on that answer, its Undo focused
+  const el = $(`#main [data-path="${to}"]`) || $(`#t-${to}`);
+  if (!el) return;
+  const d = el.closest('details');
+  if (d) d.open = true;
+  el.scrollIntoView({ block: 'center' });
+  (el.querySelector('.field-foot .link') || el).focus({ preventScroll: true });
+}
+function swap(back, to) { // page transition: the old page fades out, then the new one comes in
   const main = $('#main'), n = ++SWAP, from = shown;
-  const show = () => { render(); scrollTo(0, 0); enter(back, from == null || from === 'welcome'); };
+  const show = () => { render(); scrollTo(0, 0); enter(back, from == null || from === 'welcome'); if (to) reveal(to); };
   if (calm.matches || from == null) { show(); return; }
   main.inert = true;
   main.animate([{ opacity: 0, transform: `translateY(${back ? 8 : -8}px)` }], { duration: 180, easing: EASE_OUT, fill: 'forwards' });
@@ -214,7 +222,7 @@ function render(focusId) {
   if (fid0 && document.getElementById(fid0)) document.getElementById(fid0).focus({ preventScroll: true });
 }
 const order = (id) => STEPS.findIndex((s) => s.id === id); // welcome and done: -1
-function go(id) {
+function go(id, to) {
   if (id === shown && id === S.step) { render(); return; }
   const back = order(id) < order(shown);
   S.step = id;
@@ -222,7 +230,7 @@ function go(id) {
   normalize();
   if (document.body.dataset.view === 'form' && order(id) >= 0) renderRail(); // the rail answers the click right away
   try { history.replaceState(null, '', '#' + id); } catch {}
-  swap(back);
+  swap(back, to);
 }
 function next() {
   const i = STEPS.findIndex((s) => s.id === S.step);
@@ -364,7 +372,7 @@ document.addEventListener('click', (e) => {
   const ch = e.target.closest('[data-choice]');
   if (ch) { const g = ch.closest('[data-clear]'); set(ch.dataset.choice, g && ch.getAttribute('aria-checked') === 'true' ? JSON.parse(g.dataset.clear) : JSON.parse(ch.dataset.v)); normalize(); render(ch.id); return; }
   const g = e.target.closest('[data-go]');
-  if (g) { if (g.closest('.mprog')) g.closest('details').open = false; go(g.dataset.go); return; }
+  if (g) { if (g.closest('.mprog')) g.closest('details').open = false; go(g.dataset.go, g.dataset.to); return; }
   const a = e.target.closest('[data-act]');
   if (a && ACT[a.dataset.act]) ACT[a.dataset.act](a, e);
 });

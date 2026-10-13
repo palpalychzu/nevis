@@ -16,7 +16,7 @@ function field(o) {
   return `<div class="field-wrap ${o.full ? 'full' : ''}" data-path="${o.path}">
   <div class="field" data-invalid="${!!err}" ${o.req ? 'data-req' : ''} data-empty="${!unsure && v === ''}" ${unsure ? 'data-unsure="true"' : ''}>
     <label class="field__label" for="${id}">${esc(o.label)}${o.opt ? '<span class="field__opt"> (optional)</span>' : ''}</label>
-    <div class="field__value">${o.kind === 'money' ? '<span class="field__affix">$</span>' : ''}<input class="field__input" id="${id}" data-bind="${o.path}" data-kind="${o.kind || 'text'}" ${o.rule ? `data-rule="${o.rule}"` : ''} ${o.ac ? `data-ac="${o.ac}" autocomplete="off"` : ''} ${o.auto ? `autocomplete="${o.auto}"` : ''} type="${o.type || 'text'}" inputmode="${mode}" placeholder="${esc(o.hint || '')}" value="${unsure ? 'Not sure' : esc(v)}" ${unsure ? 'disabled' : ''} ${err ? `aria-invalid="true" aria-describedby="${id}-e"` : ''}>${o.kind === 'rate' ? '<span class="field__affix">%</span>' : ''}${o.suffix ? `<span class="field__affix">${o.suffix}</span>` : ''}</div>
+    <div class="field__value">${o.kind === 'money' && !unsure ? '<span class="field__affix">$</span>' : ''}<input class="field__input" id="${id}" data-bind="${o.path}" data-kind="${o.kind || 'text'}" ${o.rule ? `data-rule="${o.rule}"` : ''} ${o.ac ? `data-ac="${o.ac}" autocomplete="off"` : ''} ${o.auto ? `autocomplete="${o.auto}"` : ''} type="${o.type || 'text'}" inputmode="${mode}" placeholder="${esc(o.hint || '')}" value="${unsure ? esc(o.unsure === true ? 'Not sure' : o.unsure) : esc(v)}" ${unsure ? 'disabled' : ''} ${err ? `aria-invalid="true" aria-describedby="${id}-e"` : ''}>${o.kind === 'rate' && !unsure ? '<span class="field__affix">%</span>' : ''}${o.suffix ? `<span class="field__affix">${o.suffix}</span>` : ''}</div>
   </div>${fieldFoot(id, err, right)}
 </div>`;
 }
@@ -101,8 +101,8 @@ function fileItem(d) {
 const notice = (title, body, closeAct) => `<div class="notice" role="status"><span class="notice__icon">${ICON.check}</span><div class="notice__text"><div class="notice__title">${title}</div>${body}</div>${closeAct ? `<button type="button" class="notice__close" data-act="${closeAct}" aria-label="Dismiss">${ICON.close}</button>` : ''}</div>`;
 
 // ---------- Component 1 review row 1:152 ----------
-// rows: [label, value, {money, strong}]
-const reviewRows = (rows, noLabel) => `<dl class="review-rows${noLabel ? ' review-rows--plain' : ''}">${rows.map(([l, v, o = {}]) => `<div class="review-row${o.money ? ' review-row--money' : ''}${o.strong ? ' review-row--strong' : ''}">${noLabel ? '' : `<dt>${l}</dt>`}<dd>${v}</dd></div>`).join('')}</dl>`;
+// rows: [label, value, {money, strong, edit}]; edit is a link that sits at the row's right end
+const reviewRows = (rows, noLabel) => `<dl class="review-rows${noLabel ? ' review-rows--plain' : ''}">${rows.map(([l, v, o = {}]) => `<div class="review-row${o.money ? ' review-row--money' : ''}${o.strong ? ' review-row--strong' : ''}">${noLabel ? '' : `<dt>${l}</dt>`}<dd>${o.edit ? `<span>${v}</span>${o.edit}` : v}</dd></div>`).join('')}</dl>`;
 
 // ---------- Frame 115 missing row 1:157 ----------
 const missingRow = (s, n) => `<li class="missing-row"><div><div class="missing-row__title">${s.name}</div><div class="missing-row__count">${n === 1 ? '1 answer is missing' : `${n} answers are missing`}</div></div><button type="button" class="btn btn--primary btn--fix" data-go="${s.id}">Fix</button></li>`;

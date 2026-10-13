@@ -225,6 +225,7 @@ body[data-view=welcome] #main { padding: 0; }
 .review-row--money dt { width: auto; flex: 1; }
 .review-row--money dd { flex: none; text-align: right; font-variant-numeric: tabular-nums; }
 .review-row--strong dd { font-weight: 600; }
+.review-row dd:has(> .link) { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; } /* meeting rows: Edit on the right edge, like the card heads' */
 .missing-rows { display: flex; flex-direction: column; gap: 24px; }
 .missing-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 24px; border-bottom: 1px solid var(--c-border); }
 .missing-row:last-child { padding-bottom: 13px; border-bottom-color: transparent; } /* Figma clips the list 11px into the last row's space (1:942 in 1:934) */
@@ -352,6 +353,7 @@ details.more[open] .more__chev svg { transform: rotate(180deg); }
   .welcome__advisor { flex-direction: column; gap: 24px; }
   .welcome__msg { height: auto; gap: 24px; }
   .review-row:not(.review-row--money) { flex-direction: column; gap: 4px; }
+  .review-row:not(.review-row--money) dt { width: auto; } /* stacked: the label takes the row, not the 180px column */
   .hdr__actions { gap: 8px; margin-top: 22px; }
   .hdr__actions .btn { height: 32px; padding: 0 8px; font: var(--t-small-medium); } /* smaller so logo + both fit a 360px phone */
 }

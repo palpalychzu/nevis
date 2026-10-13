@@ -223,15 +223,25 @@ STEP_VIEW.more = () => {
 };
 
 // ---------- review & send ----------
-const LABEL = { marital: 'Marital status', street: 'Street address', city: 'City', state: 'State', zip: 'ZIP code', status: 'Employment status', amount: 'Income amount', value: 'Amount', hasDeps: 'Dependents', type: 'Type', inst: 'Account', retireAge: 'Retirement age', retireCost: 'Spending in retirement', spending: 'Monthly spending', cost: 'Goal cost', when: 'Target date', name: 'Name', rel: 'Relationship', dob: 'Date of birth', middle: 'Middle name', lender: 'Lender', rate: 'Interest rate' };
+const LABEL = { amount: 'Amount', value: 'Amount', inst: 'Institution', lender: 'Lender', rate: 'Interest rate', when: 'Target date', retireAge: 'Retirement age', retireCost: 'Spending in retirement', spending: 'Monthly spending' }; // the fields that offer Not sure
 const REQ_STEPS = ['you', 'work', 'goals', 'networth'];
+function meetingRows() { // Not sure answers in form order: the item, then what's open, then an Edit that lands on that field
+  const rows = [], edit = (id, to) => ({ edit: link('Edit', `data-go="${id}" data-to="${to}"`) });
+  for (const s of STEPS.filter((x) => x.id !== 'review')) {
+    const html = STEP_VIEW[s.id](), at = (k) => html.indexOf(`data-path="${k}"`); // not drawn = hidden by a later answer (Retired, no debts, a category unselected), so it drops out
+    Object.keys(S.notSure).filter((k) => S.notSure[k] && at(k) >= 0).sort((a, b) => at(a) - at(b)).forEach((k) => {
+      const f = LABEL[k.split('.').at(-1)], state = k.endsWith('.when') ? 'Flexible' : 'Not sure', o = k.includes('#') && resolve(k)[0];
+      rows.push(o ? [esc(o.name || o.inst || o.lender || o.source || o.type || s.name), `${f}: ${state}`, edit(s.id, k)] : [f, state, edit(s.id, k)]);
+    });
+    if (s.id === 'goals' && S.goalsUnsure) rows.push(['Your goals', 'Not sure yet', edit('goals', 'goalsUnsure')]);
+  }
+  return rows;
+}
 STEP_VIEW.review = () => {
   const miss = STEPS.filter((s) => REQ_STEPS.includes(s.id)).map((s) => [s, missing(s.id)]).filter((x) => x[1]);
-  const unsure = Object.keys(S.notSure).filter((k) => S.notSure[k] && get(k) !== undefined && !(S.noIncome && k.startsWith('incomes#'))), t = totals();
+  const t = totals(), meeting = meetingRows();
   const edit = (id) => link('Edit', `data-go="${id}"`);
   const deps = S.hasDeps ? S.deps.map((d) => d.name).filter(Boolean).join(', ') || 'Yes' : S.hasDeps === false ? 'None' : '—';
-  const meeting = unsure.map((k) => { const o = k.includes('#') ? resolve(k)[0] : null; return [LABEL[k.split('.').at(-1)] || k, esc(o?.inst || o?.lender || o?.name || o?.type || 'Not sure')]; });
-  if (S.goalsUnsure) meeting.push(['Your goals', 'Not sure yet']);
   return `${pageHead(title('review'), 'Change anything that looks off.')}
 <div class="cards">
   ${miss.length ? `<section class="card card--missing">${cardHead('Some required answers are missing', 'Please fix these', '', ICON.warning)}<ul class="missing-rows">${miss.map(([s, n]) => missingRow(s, n)).join('')}</ul></section>` : ''}
